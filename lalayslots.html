@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LalaySlots — Complete Demo</title>
+<style>
+:root{
+  --bg:#050203; --panel:#0b0a0b; --muted:rgba(255,255,255,0.10);
+  --gold:#c89a2f; --red:#b71c1c; --accent:#8b5cf6;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, 'Segoe UI', system-ui, -apple-system, sans-serif;background:linear-gradient(180deg,var(--bg),#070406);color:#eee}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:52px;height:52px;border-radius:8px;background:linear-gradient(180deg,#12090a,#241014);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold);font-size:20px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.title{font-size:18px;color:var(--gold);letter-spacing:1px}
+.sub{font-size:12px;color:var(--muted)}
+.container{display:flex;gap:18px;max-width:1150px;margin:18px auto;padding:12px}
+.left{flex:1;background:linear-gradient(180deg,#07060a,#0a0710);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+.right{width:320px;background:linear-gradient(180deg,#06070a,#040204);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{padding:10px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+.tab.active{background:linear-gradient(90deg,rgba(200,154,47,0.06),transparent);border:1px solid rgba(200,154,47,0.14)}
+.section{display:none}
+.section.active{display:block}
+/* Slot styles */
+.slot-area{display:flex;flex-direction:column;align-items:center;gap:12px}
+.reels{display:flex;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#0c0b0c,#070608);box-shadow:inset 0 -10px 40px rgba(0,0,0,0.6)}
+.reel{width:120px;height:120px;border-radius:10px;background:linear-gradient(180deg,#0f0c10,#050305);display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.02)}
+.reel .track{position:absolute;top:0;left:0;right:0}
+.controls{display:flex;gap:10px;align-items:center;margin-top:8px}
+.btn{padding:10px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+.spin{background:linear-gradient(90deg,#ffd54f,#ffb74d);color:#111}
+.auto{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff}
+.bet-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.bet{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+.bet.active{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.22)}
+.info{display:flex;justify-content:space-between;align-items:center;padding:10px;margin-top:10px;border-radius:8px;background:rgba(255,255,255,0.02)}
+.balance{font-size:20px;color:var(--gold);font-weight:800}
+.small{font-size:12px;color:var(--muted)}
+.message{margin-top:8px;font-size:16px}
+/* Card table */
+.cards-row{display:flex;gap:12px;justify-content:center;margin-top:12px}
+.card{width:110px;height:150px;border-radius:10px;background:linear-gradient(180deg,#fff,#f3f3f3);color:#111;display:flex;flex-direction:column;justify-content:space-between;padding:10px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+.card .top{font-size:16px}
+.card .suit{font-size:44px;text-align:center}
+.card.red{color:#b71c1c}
+/* Right panel */
+.panel{padding:12px;border-radius:10px;background:linear-gradient(180deg,#06060a,#040204);border:1px solid rgba(255,255,255,0.02)}
+.input{width:100%;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff}
+.leader{margin-top:12px}
+.leader .row{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px dashed rgba(255,255,255,0.02)}
+.history{max-height:220px;overflow:auto;margin-top:10px;padding-top:6px}
+.footer{max-width:1150px;margin:10px auto;text-align:center;color:rgba(255,255,255,0.4)}
+/* Confetti */
+canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;}
+/* responsive */
+@media(max-width:900px){.container{flex-direction:column}.right{width:100%}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <div class="logo">LS</div>
+    <div>
+      <div class="title">LalaySlots</div>
+      <div class="sub">Gothic Demo • No real money • For testing only</div>
+    </div>
+  </div>
+  <div class="sub">Welcome, <span id="playerName">Lalay</span></div>
+</div>
+
+<div class="container">
+  <div class="left">
+    <div class="tabs">
+      <div class="tab active" data-tab="slot">🎰 Slots</div>
+      <div class="tab" data-tab="cards">🃏 Cards (5)</div>
+      <div class="tab" data-tab="leader">🏆 Leaderboard</div>
+    </div>
+
+    <div id="slot" class="section active">
+      <div class="slot-area">
+        <div style="display:flex;justify-content:space-between;width:100%">
+          <div class="small">Classic 3-reel slot • Bet selects on the right</div>
+          <div class="small" id="lastResult">Last: —</div>
+        </div>
+
+        <div class="reels" id="reels">
+          <div class="reel" id="reel1"><div class="track">❔</div></div>
+          <div class="reel" id="reel2"><div class="track">❔</div></div>
+          <div class="reel" id="reel3"><div class="track">❔</div></div>
+        </div>
+
+        <div class="controls">
+          <button class="btn spin" id="spinBtn">SPIN</button>
+          <button class="btn auto" id="autoBtn">AUTO: Off</button>
+          <div style="margin-left:12px" class="small">Multiplier: <span id="mult">1x</span></div>
+        </div>
+
+        <div class="bet-list" id="betList"></div>
+        <div class="info">
+          <div class="small">Balance</div>
+          <div class="balance" id="balance">₱1000.00</div>
+        </div>
+        <div class="message" id="slotMessage"></div>
+      </div>
+    </div>
+
+    <div id="cards" class="section">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="small">Draw 5 cards from a fresh deck • Payouts based on hand rank</div>
+        <div class="small" id="cardsLast">Last: —</div>
+      </div>
+      <div class="cards-row" id="cardsRow">
+        <div class="card" id="card1">?
+          <div class="suit"> </div>
+        </div>
+        <div class="card" id="card2">?
+          <div class="suit"> </div>
+        </div>
+        <div class="card" id="card3">?
+          <div class="suit"> </div>
+        </div>
+        <div class="card" id="card4">?
+          <div class="suit"> </div>
+        </div>
+        <div class="card" id="card5">?
+          <div class="suit"> </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+        <button class="btn spin" id="drawBtn">DRAW 5</button>
+        <button class="btn auto" id="reshuffleBtn">RESHUFFLE</button>
+        <div style="margin-left:auto" class="small">Bet: ₱<span id="cardBet">10</span></div>
+      </div>
+      <div class="message" id="cardMessage" style="margin-top:10px"></div>
+    </div>
+
+    <div id="leader" class="section">
+      <div class="small">Top players (demo)</div>
+      <div style="margin-top:10px;font-size:14px" id="leaderboard"></div>
+    </div>
+
+  </div>
+
+  <div class="right">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="small">Player</div>
+          <div style="font-weight:800;font-size:18px"> <span id="displayName">Lalay</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Balance</div>
+          <div style="font-weight:800;color:var(--gold);font-size:20px" id="sideBal">₱1000.00</div>
+        </div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,0.03);margin:10px 0">
+
+      <div class="small">Select bet</div>
+      <input id="customBet" class="input" type="number" min="0.5" step="0.5" value="10" />
+      <div style="margin-top:8px" class="small">Quick bets</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <!-- quick bets will be injected -->
+        <div id="quickBets"></div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn auto" id="resetBtn">RESET</button>
+        <button class="btn spin" id="topupBtn">+₱1000</button>
+      </div>
+
+      <div class="leader" id="miniLeader">
+        <div class="small" style="margin-top:12px">Leaderboard</div>
+        <div id="miniList"></div>
+      </div>
+
+      <div style="margin-top:12px" class="small">History</div>
+      <div class="history" id="history"></div>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
+<div class="footer">LalaySlots demo — for learning & local testing only. No real money.</div>
+
+<script>
+/* -----------------------------
+   Utility & persistence
+   -----------------------------*/
+function fmt(n){ return Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) }
+const STORAGE = {bal:'lalay_bal_v1', history:'lalay_hist_v1', name:'lalay_name_v1'};
+let balance = parseFloat(localStorage.getItem(STORAGE.bal)) || 1000.00;
+let player = localStorage.getItem(STORAGE.name) || 'Lalay';
+const historyEl = document.getElementById('history');
+const leaderData = [{name:'Lalay',bal:balance},{name:'Shadow',bal:4200},{name:'Raven',bal:2890},{name:'Noctis',bal:1680}];
+
+function save(){ localStorage.setItem(STORAGE.bal,balance); }
+function addHistory(txt){ const el=document.createElement('div'); el.style.padding='6px 8px'; el.style.borderBottom='1px dashed rgba(255,255,255,0.03)'; el.className='small'; el.textContent = `${new Date().toLocaleTimeString()} • ${txt}`; historyEl.prepend(el); // keep 100
+ if(historyEl.children.length>120) historyEl.removeChild(historyEl.lastChild);
+ const arr = JSON.parse(localStorage.getItem(STORAGE.history)||'[]'); arr.unshift(`${new Date().toISOString()}|${txt}`); localStorage.setItem(STORAGE.history, JSON.stringify(arr.slice(0,200)));
+}
+
+function updateDisplays(){ document.getElementById('balance').textContent = '₱'+fmt(balance); document.getElementById('sideBal').textContent = '₱'+fmt(balance); document.getElementById('displayName').textContent = player; document.getElementById('playerName').textContent = player; save(); renderMiniLeader(); }
+
+/* -----------------------------
+   Sound: WebAudio helper
+   -----------------------------*/
+const AudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+function tone(freq=440,dur=0.08,when=0,type='sine',vol=0.06){ const o=AudioCtx.createOscillator(); const g=AudioCtx.createGain(); o.type=type; o.frequency.value=freq; g.gain.value=0.0001; o.connect(g); g.connect(AudioCtx.destination); o.start(AudioCtx.currentTime+when); g.gain.exponentialRampToValueAtTime(vol,AudioCtx.currentTime+when+0.01); g.gain.exponentialRampToValueAtTime(0.0001,AudioCtx.currentTime+when+dur); o.stop(AudioCtx.currentTime+when+dur+0.02); }
+function clickSound(){ tone(900,0.04,0,'square',0.04); }
+function winSound(){ tone(1200,0.12,0,'sine',0.08); tone(880,0.08,0.12,'sine',0.06); }
+function loseSound(){ tone(240,0.06,0,'sine',0.04); }
+
+/* -----------------------------
+   Confetti simple
+   -----------------------------*/
+const confettiCanvas = document.getElementById('confetti'); const confettiCtx = confettiCanvas.getContext('2d'); function resizeC(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; } window.addEventListener('resize',resizeC); resizeC(); let confettiPieces=[]; function popConfetti(){ confettiPieces = []; for(let i=0;i<60;i++){ confettiPieces.push({x:Math.random()*confettiCanvas.width,y:-20, vx:(Math.random()-0.5)*6,vy:Math.random()*4+2, size:Math.random()*6+4, color: i%2? 'rgba(200,154,47,0.95)':'rgba(183,28,28,0.95)'}); } requestAnimationFrame(confAnim); }
+function confAnim(){ confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); for(const p of confettiPieces){ p.x+=p.vx; p.y+=p.vy; p.vy += 0.08; confettiCtx.fillStyle=p.color; confettiCtx.fillRect(p.x,p.y,p.size,p.size*0.6); } confettiPieces = confettiPieces.filter(p=>p.y<confettiCanvas.height+50); if(confettiPieces.length>0) requestAnimationFrame(confAnim); }
+
+/* -----------------------------
+   Slot Engine
+   -----------------------------*/
+const symbols = ['🍒','🍋','⭐','7️⃣','🍉','🔔'];
+const reelEls = [document.getElementById('reel1'),document.getElementById('reel2'),document.getElementById('reel3')];
+let auto = false; let autoInterval=null; let spins=0,wins=0;
+// bets array
+const bets = [0.5,1,2,3,5,10,20,30,50,100];
+const betListEl = document.getElementById('betList'); const quickBets = document.getElementById('quickBets');
+let currentBet = parseFloat(document.getElementById('customBet').value) || 10;
+
+function renderBets(){ betListEl.innerHTML=''; quickBets.innerHTML=''; bets.forEach(b=>{
+  const el = document.createElement('div'); el.className='bet'; el.textContent = '₱'+(b%1?b:b.toString()); el.addEventListener('click',()=>{ currentBet=b; document.getElementById('customBet').value = b; highlightBet(b); }); betListEl.appendChild(el);
+  const qb = document.createElement('button'); qb.className='btn auto'; qb.textContent='₱'+(b%1?b:b.toString()); qb.addEventListener('click',()=>{ currentBet=b; document.getElementById('customBet').value=b; highlightBet(b); }); quickBets.appendChild(qb);
+}); highlightBet(currentBet);
+}
+function highlightBet(b){ document.querySelectorAll('.bet').forEach(el=>el.classList.remove('active')); [...document.querySelectorAll('.bet')].find(el=>el.textContent.includes(String(b)))?.classList.add('active'); document.getElementById('customBet').value = b; }
+
+function spin(){ if (balance < currentBet){ document.getElementById('slotMessage').textContent='❌ Not enough balance'; loseSound(); return; }
+ balance = Number((balance - currentBet).toFixed(2)); updateDisplays(); spins++; clickSound(); document.getElementById('slotMessage').textContent='Spinning...';
+ const results = [];
+ const times = [700,900,1100];
+ reelEls.forEach((el,i)=>{
+   const track = el.querySelector('.track');
+   let t=0;
+   const iv = setInterval(()=>{ track.textContent = symbols[Math.floor(Math.random()*symbols.length)]; },70);
+   setTimeout(()=>{ clearInterval(iv); const sym = symbols[Math.floor(Math.random()*symbols.length)]; track.textContent = sym; results[i]=sym; el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),600);
+     if(i===reelEls.length-1) evaluateSlot(results);
+   }, times[i]);
+ });
+}
+
+function evaluateSlot(res){ const [a,b,c]=res; let win=0,msg=''; if(a===b && b===c){ win = currentBet * 10; msg = `🎉 JACKPOT ${a} x10 (+₱${fmt(win)})`; }
+ else if (a===b || b===c || a===c){ win = currentBet * 2; msg = `✨ Pair (+₱${fmt(win)})`; }
+ else if (res.includes('7️⃣') && (a=== '7️⃣' || b==='7️⃣' || c==='7️⃣')){ win = currentBet*5; msg = `🔥 Lucky 7 (+₱${fmt(win)})`; }
+ else { msg='😢 No win'; }
+ if(win>0){ balance = Number((balance + win).toFixed(2)); wins++; winSound(); popConfetti(); } else loseSound(); document.getElementById('slotMessage').textContent = msg; document.getElementById('lastResult').textContent = 'Last: '+msg; addHistory(`Slot • Bet ₱${fmt(currentBet)} • ${msg}`); updateDisplays(); }
+
+/* Auto handling */
+document.getElementById('spinBtn').addEventListener('click', ()=> spin());
+document.getElementById('autoBtn').addEventListener('click', ()=>{
+ auto = !auto; document.getElementById('autoBtn').textContent = auto? 'AUTO: On':'AUTO: Off'; if(auto){ autoInterval = setInterval(()=>{ if(balance < currentBet){ toggleAutoOff(); document.getElementById('slotMessage').textContent='Auto stopped: low balance'; return; } spin(); }, 1200); } else toggleAutoOff(); });
+function toggleAutoOff(){ auto=false; clearInterval(autoInterval); document.getElementById('autoBtn').textContent='AUTO: Off'; }
+
+/* -----------------------------
+   Card Engine (5-card draw)
+   -----------------------------*/
+let deck = [];
+function makeDeck(){ const suits=['♠','♥','♦','♣']; const ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K']; deck = []; for(const s of suits) for(const r of ranks) deck.push({rank:r,suit:s}); shuffle(deck); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
+function draw5(){ if(balance < currentBet){ document.getElementById('cardMessage').textContent='❌ Not enough balance'; loseSound(); return; }
+ if(deck.length < 5) makeDeck(); balance = Number((balance - currentBet).toFixed(2)); updateDisplays(); const hand = [deck.pop(),deck.pop(),deck.pop(),deck.pop(),deck.pop()]; renderHand(hand); const result = evaluateHand(hand); if(result.win>0){ balance = Number((balance + result.win).toFixed(2)); wins++; winSound(); popConfetti(); } else loseSound(); document.getElementById('cardMessage').textContent = result.msg; addHistory(`Cards • Bet ₱${fmt(currentBet)} • ${result.msg}`); document.getElementById('cardsLast').textContent = 'Last: '+result.msg; updateDisplays(); }
+
+function renderHand(hand){ for(let i=1;i<=5;i++){ const el = document.getElementById('card'+i); const c = hand[i-1]; el.innerHTML = `<div class="top">${c.rank}</div><div class="suit">${c.suit}</div><div class="bottom" style="text-align:right">${c.rank}</div>`; el.classList.toggle('red',(c.suit==='♥'||c.suit==='♦')); } }
+
+function evaluateHand(hand){ // returns {win,msg}
+ const rankValues = {A:14,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,J:11,Q:12,K:13};
+ const ranks = hand.map(h=>h.rank);
+ const suits = hand.map(h=>h.suit);
+ const counts = {}; ranks.forEach(r=>counts[r]=(counts[r]||0)+1);
+ const countsArr = Object.values(counts).sort((a,b)=>b-a);
+ const uniqueRanks = Object.keys(counts).length;
+ const isFlush = suits.every(s=>s===suits[0]);
+ const vals = hand.map(h=>rankValues[h.rank]).sort((a,b)=>a-b);
+ const isStraight = vals.every((v,i,arr)=> i===0 || v === arr[i-1]+1) || (JSON.stringify(vals)==='[2,3,4,5,14]'); // A low
+ // determine hand
+ let win=0,msg='';
+ if(isStraight && isFlush && Math.max(...vals)===14){ win = currentBet*100; msg='Royal Flush!'; }
+ else if(isStraight && isFlush){ win = currentBet*50; msg='Straight Flush!'; }
+ else if(countsArr[0]===4){ win = currentBet*25; msg='Four of a Kind!'; }
+ else if(countsArr[0]===3 && countsArr[1]===2){ win = currentBet*12; msg='Full House!'; }
+ else if(isFlush){ win = currentBet*10; msg='Flush!'; }
+ else if(isStraight){ win = currentBet*8; msg='Straight!'; }
+ else if(countsArr[0]===3){ win = currentBet*5; msg='Three of a Kind!'; }
+ else if(countsArr[0]===2 && countsArr[1]===2){ win = currentBet*3; msg='Two Pair!'; }
+ else if(countsArr[0]===2){ win = currentBet*2; msg='One Pair!'; }
+ else { win = 0; msg='High card • No win'; }
+ return {win: Number(win.toFixed(2)), msg}; }
+
+/* -----------------------------
+   Buttons & UI wiring
+   -----------------------------*/
+makeDeck(); renderBets(); updateDisplays();
+
+document.getElementById('customBet').addEventListener('change',(e)=>{ let v=parseFloat(e.target.value)||10; if(v<0.5) v=0.5; currentBet = v; document.getElementById('cardBet').textContent = currentBet; highlightBet(currentBet); });
+
+document.getElementById('drawBtn').addEventListener('click', ()=> draw5());
+document.getElementById('reshuffleBtn').addEventListener('click', ()=>{ makeDeck(); document.getElementById('cardMessage').textContent='🃏 Deck reshuffled'; addHistory('Deck reshuffled'); clickSound(); });
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{ balance = 1000.00; makeDeck(); updateDisplays(); addHistory('Balance reset'); });
+
+document.getElementById('topupBtn').addEventListener('click', ()=>{ balance = Number((balance + 1000).toFixed(2)); updateDisplays(); addHistory('+₱1000 topup'); });
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t=> t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const tab=t.dataset.tab; document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(tab).classList.add('active'); }));
+
+// Leaderboard render
+function renderMiniLeader(){ const ml = document.getElementById('miniList'); ml.innerHTML=''; leaderData.forEach(p=>{ const r=document.createElement('div'); r.className='row'; r.style.padding='6px 8px'; r.style.borderBottom='1px dashed rgba(255,255,255,0.03)'; r.innerHTML = `<div class='small'>${p.name}</div><div style='font-weight:700;color:var(--gold)'>₱${fmt(p.bal)}</div>`; ml.appendChild(r); }); }
+function renderLeaderboard(){ const el = document.getElementById('leaderboard'); el.innerHTML=''; leaderData.forEach(p=>{ const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px 6px'; row.innerHTML = `<div style='font-weight:700'>${p.name}</div><div style='color:var(--gold);font-weight:800'>₱${fmt(p.bal)}</div>`; el.appendChild(row); }); }
+renderLeaderboard();
+
+// history from storage
+const storedHist = JSON.parse(localStorage.getItem(STORAGE.history)||'[]'); storedHist.slice(0,30).forEach(h=>{ const [ts,txt] = h.split('|'); const d = new Date(ts); const el = document.createElement('div'); el.className='small'; el.style.padding='6px 8px'; el.style.borderBottom='1px dashed rgba(255,255,255,0.03)'; el.textContent = `${d.toLocaleTimeString()} • ${txt}`; historyEl.appendChild(el); });
+
+/* small keyboard support */
+window.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ e.preventDefault(); spin(); } });
+
+// visual flash class
+const style = document.createElement('style'); style.innerHTML = `.flash{animation:flash 700ms cubic-bezier(.2,.8,.2,1);} @keyframes flash{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}`; document.head.appendChild(style);
+
+// expose some debug
+window.lalay = {spin, draw5};
+</script>
+</body>
+</html>
