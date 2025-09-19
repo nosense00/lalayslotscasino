@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🎰 LalaySlots</title>
   <style>
+    /* Body & fonts */
     @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
 
     body {
@@ -15,102 +17,157 @@
       padding: 20px;
     }
 
-    h2, p.subtitle {
+    h2 {
       font-family: 'UnifrakturCook', cursive;
       color: darkred;
-      margin: 5px 0;
+      font-size: 2em;
+      margin-bottom: 0.2em;
     }
 
+    p.description {
+      font-size: 1.1em;
+      margin-top: 0;
+      color: #eee;
+    }
+
+    /* Slot machine layout */
     #slot-machine {
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 15px;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
 
     #slot-machine div {
-      width: 30px;  /* smaller than before */
-      height: 30px;
+      width: 80px;
+      height: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       border: 2px solid #444;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #222;
+      transition: transform 0.3s;
     }
 
     #slot-machine img {
-      width: 25px;
-      height: 25px;
+      width: 70px;
+      height: 70px;
       object-fit: cover;
     }
 
-    button {
+    /* Spin button */
+    #spin-btn {
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 10px 25px;
+      font-size: 1.2em;
       cursor: pointer;
-      border-radius: 6px;
-      border: none;
       background: darkred;
       color: #fff;
+      border: none;
+      border-radius: 5px;
+      transition: transform 0.2s;
     }
 
-    button:hover {
-      background: #a00;
+    #spin-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Music controls */
+    #music-controls {
+      margin-top: 15px;
+      font-size: 1em;
+    }
+
+    #music-controls button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      margin: 0 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      #slot-machine div {
+        width: 60px;
+        height: 60px;
+      }
+
+      #slot-machine img {
+        width: 50px;
+        height: 50px;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      #spin-btn {
+        font-size: 1em;
+        padding: 8px 18px;
+      }
     }
   </style>
 </head>
 <body>
   <h2>🎰 LalaySlots</h2>
-  <p class="subtitle">Classic 3-reel slot • Gothic Demo • Beta test v1</p>
+  <p class="description">Classic 3-reel slot • Gothic Demo • Beta test v1</p>
 
   <div id="slot-machine">
-    <div id="reel1"><img src="maroro.jpg" alt="maroro" /></div>
-    <div id="reel2"><img src="mavincars.jpg" alt="mavincars" /></div>
-    <div id="reel3"><img src="rensrapis.jpg" alt="rensrapis" /></div>
+    <div id="reel1"><img src="maroro.jpg" alt="maroro"></div>
+    <div id="reel2"><img src="mavincars.jpg" alt="mavincars"></div>
+    <div id="reel3"><img src="rensrapis.jpg" alt="rensrapis"></div>
   </div>
 
-  <p>Press SPIN to play!</p>
-  <button id="spinBtn">🎯 SPIN</button>
-  <br/>
-  <button id="musicBtn">▶ Play Music</button>
+  <button id="spin-btn">🎯 SPIN</button>
+
+  <div id="music-controls">
+    <button id="play-music">▶ Play Music</button>
+    <button id="pause-music">⏸ Pause Music</button>
+  </div>
 
   <audio id="bg-music" loop>
     <source src="test.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
+    Your browser does not support audio.
   </audio>
 
   <script>
     const music = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('musicBtn');
-    musicBtn.addEventListener('click', () => {
-      if (music.paused) {
-        music.play();
-        musicBtn.textContent = '⏸ Pause Music';
-      } else {
-        music.pause();
-        musicBtn.textContent = '▶ Play Music';
-      }
+    const playBtn = document.getElementById('play-music');
+    const pauseBtn = document.getElementById('pause-music');
+
+    // Play music
+    playBtn.addEventListener('click', () => {
+      music.play();
     });
 
+    // Pause music
+    pauseBtn.addEventListener('click', () => {
+      music.pause();
+    });
+
+    // Spin animation
     const reels = [
-      document.getElementById('reel1').firstElementChild,
-      document.getElementById('reel2').firstElementChild,
-      document.getElementById('reel3').firstElementChild
+      document.getElementById('reel1'),
+      document.getElementById('reel2'),
+      document.getElementById('reel3')
     ];
 
     const images = ['maroro.jpg', 'mavincars.jpg', 'rensrapis.jpg'];
 
-    document.getElementById('spinBtn').addEventListener('click', () => {
-      reels.forEach((reel, idx) => {
-        let spins = Math.floor(Math.random() * 10 + 10);
-        let current = 0;
+    document.getElementById('spin-btn').addEventListener('click', () => {
+      reels.forEach((reel, index) => {
+        let spins = 10 + Math.floor(Math.random() * 10);
+        let i = 0;
         const interval = setInterval(() => {
-          reel.src = images[Math.floor(Math.random() * images.length)];
-          current++;
-          if (current >= spins) clearInterval(interval);
+          reel.querySelector('img').src = images[Math.floor(Math.random() * images.length)];
+          i++;
+          if(i >= spins) clearInterval(interval);
         }, 100);
       });
     });
