@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LalaySlots</title>
-  <!-- Load Gothic/Blackletter font from Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+  <title>🎰 LalaySlots</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
     body {
       font-family: Arial, sans-serif;
       background: #111;
@@ -14,62 +14,57 @@
       margin: 0;
       padding: 20px;
     }
-    h2, p.slot-title {
-      font-family: 'UnifrakturCook', cursive;  /* Gothic font */
-      color: #ffcc00;
+
+    h2, p.subtitle {
+      font-family: 'UnifrakturCook', cursive;
+      color: darkred;
+      margin: 5px 0;
     }
-    h2 {
-      font-size: 3em;
-      margin-bottom: 10px;
-    }
-    p.slot-title {
-      font-size: 1.5em;
-    }
+
     #slot-machine {
       display: flex;
-      gap: 25px;
+      gap: 10px;
       justify-content: center;
-      margin-top: 40px;
+      margin-top: 20px;
     }
+
     #slot-machine div {
-      width: 600px;
-      height: 600px;
+      width: 30px;  /* smaller than before */
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 4px solid #444;
-      border-radius: 16px;
-      background: #222;
-      position: relative;
-    }
-    #slot-machine img {
-      width: 500px;
-      height: 500px;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-      transition: transform 0.3s ease-in-out;
-    }
-    button {
-      font-size: 1.2em;
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
+      border: 2px solid #444;
       border-radius: 8px;
-      cursor: pointer;
-      background: #444;
-      color: #eee;
+      background: #222;
     }
+
+    #slot-machine img {
+      width: 25px;
+      height: 25px;
+      object-fit: cover;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background: darkred;
+      color: #fff;
+    }
+
     button:hover {
-      background: #666;
+      background: #a00;
     }
   </style>
 </head>
 <body>
   <h2>🎰 LalaySlots</h2>
-  <p class="slot-title">Classic 3-reel slot • Gothic Demo • No real money</p>
+  <p class="subtitle">Classic 3-reel slot • Gothic Demo • Beta test v1</p>
 
   <div id="slot-machine">
     <div id="reel1"><img src="maroro.jpg" alt="maroro" /></div>
@@ -77,57 +72,48 @@
     <div id="reel3"><img src="rensrapis.jpg" alt="rensrapis" /></div>
   </div>
 
-  <p style="margin-top:40px;">Press SPIN to play!</p>
-  <button onclick="spinReels()">🎯 SPIN</button>
+  <p>Press SPIN to play!</p>
+  <button id="spinBtn">🎯 SPIN</button>
+  <br/>
+  <button id="musicBtn">▶ Play Music</button>
 
-  <!-- 🎵 Background Music -->
   <audio id="bg-music" loop>
     <source src="test.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 
-  <div style="margin-top:20px;">
-    <button onclick="playMusic()">▶ Play Music</button>
-    <button onclick="pauseMusic()">⏸ Pause Music</button>
-  </div>
-
   <script>
-    const bgMusic = document.getElementById("bg-music");
-    const reels = [
-      document.getElementById("reel1").querySelector("img"),
-      document.getElementById("reel2").querySelector("img"),
-      document.getElementById("reel3").querySelector("img")
-    ];
-    const reelImages = ["maroro.jpg","mavincars.jpg","rensrapis.jpg"];
-
-    function playMusic() {
-      bgMusic.play().catch(err => console.log("Autoplay blocked:", err));
-    }
-    function pauseMusic() {
-      bgMusic.pause();
-    }
-
-    // Auto-play on first click
-    document.addEventListener("click", () => {
-      if (bgMusic.paused) {
-        bgMusic.play().catch(()=>{});
+    const music = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('musicBtn');
+    musicBtn.addEventListener('click', () => {
+      if (music.paused) {
+        music.play();
+        musicBtn.textContent = '⏸ Pause Music';
+      } else {
+        music.pause();
+        musicBtn.textContent = '▶ Play Music';
       }
-    }, { once: true });
+    });
 
-    // Simple SPIN animation
-    function spinReels() {
-      reels.forEach((reel, i) => {
-        let spins = 10 + Math.floor(Math.random() * 10); // 10-20 rotations
-        let index = 0;
+    const reels = [
+      document.getElementById('reel1').firstElementChild,
+      document.getElementById('reel2').firstElementChild,
+      document.getElementById('reel3').firstElementChild
+    ];
+
+    const images = ['maroro.jpg', 'mavincars.jpg', 'rensrapis.jpg'];
+
+    document.getElementById('spinBtn').addEventListener('click', () => {
+      reels.forEach((reel, idx) => {
+        let spins = Math.floor(Math.random() * 10 + 10);
+        let current = 0;
         const interval = setInterval(() => {
-          index = (index + 1) % reelImages.length;
-          reel.src = reelImages[index];
-          reel.style.transform = `translateY(${Math.random()*20 - 10}px)`; // small jiggle
-          spins--;
-          if(spins <= 0) clearInterval(interval);
-        }, 100 + i*50); // slight delay per reel
+          reel.src = images[Math.floor(Math.random() * images.length)];
+          current++;
+          if (current >= spins) clearInterval(interval);
+        }, 100);
       });
-    }
+    });
   </script>
 </body>
 </html>
