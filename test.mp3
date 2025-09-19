@@ -1,0 +1,35 @@
+import { useEffect } from "react";
+
+export default function App() {
+  useEffect(() => {
+    const audio = document.getElementById("bg-music");
+    if (audio) {
+      audio.volume = 0.4; // adjust volume so di kusog kaayo
+      audio.play().catch(() => {
+        console.log("Autoplay was blocked, user interaction needed.");
+      });
+    }
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <h1 className="text-3xl font-bold mb-4">🎶 Background Music Test</h1>
+      <p className="mb-6">Kung madunggan nimo ang tunog, working siya fren!</p>
+
+      <audio id="bg-music" autoPlay loop>
+        <source src="test.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element.
+      </audio>
+
+      <button
+        className="px-4 py-2 bg-blue-600 rounded-lg shadow hover:bg-blue-700"
+        onClick={() => {
+          const audio = document.getElementById("bg-music");
+          if (audio) audio.play();
+        }}
+      >
+        ▶ Play Music
+      </button>
+    </div>
+  );
+}
